@@ -106,13 +106,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px 0;
+            padding: 30px 0;
             border-bottom: 1px solid rgba(0, 217, 255, 0.2);
         }
         .logo {
             display: flex;
             align-items: center;
-            width: 70px;
+            /* 关键修改：将logo宽度从150px改为200px（你可以根据需要调整） */
+            width: 200px;
             height: auto;
         }
         .logo img {
@@ -342,6 +343,65 @@
             margin-top: 70px;
             padding-top: 40px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 居中视频容器 */
+        .video-center-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        /* 视频链接按钮 - 调大 */
+        .video-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px; /* 增加图标和文字间距 */
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600; /* 加粗字体 */
+            transition: all 0.3s;
+            padding: 18px 40px; /* 增加内边距，原为12px 25px */
+            border-radius: 35px; /* 稍微增加圆角 */
+            background: linear-gradient(90deg, rgba(0, 217, 255, 0.15), rgba(122, 4, 235, 0.1)); /* 添加渐变背景 */
+            border: 2px solid rgba(0, 217, 255, 0.4); /* 加粗边框 */
+            font-size: 1.2rem; /* 增加字体大小 */
+        }
+
+        .video-link:hover {
+            background: linear-gradient(90deg, rgba(0, 217, 255, 0.25), rgba(122, 4, 235, 0.15));
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.5), 0 5px 20px rgba(122, 4, 235, 0.3);
+            transform: translateY(-3px) scale(1.05); /* 添加缩放效果 */
+            border-color: var(--primary);
+        }
+
+        /* 可以添加图标放大效果 */
+        .video-link i {
+            font-size: 1.5rem; /* 放大图标 */
+            transition: transform 0.3s;
+        }
+
+        .video-link:hover i {
+            transform: scale(1.2); /* 悬停时图标放大 */
+        }
+        
+        
+        /* 右侧按钮容器 */
+        .product-contact-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        /* 缩小右侧按钮 */
+        .product-contact-btn {
+            padding: 11px 23px; /* 减小内边距 */
+            font-size: 0.85rem; /* 略微减小字体大小 */
+            margin-top: 0;
+        }
+        
+        .product-contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 217, 255, 0.4);
         }
 
         /* === About & Contact Pages === */
@@ -610,9 +670,22 @@
         .footer-links a:hover {
             color: var(--primary);
         }
+        /* 关键修改：同时调整footer中的logo大小 */
         .logo {
-            width: 70px;
+            width: 120px;
             height: auto;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .product-contact-container {
+                justify-content: center;
+                margin-top: 20px;
+            }
+            /* 响应式下的logo大小调整（可选） */
+            .logo {
+                width: 150px;
+            }
         }
     </style>
 </head>
@@ -623,7 +696,7 @@
         <!-- Header & Navigation -->
         <header>
             <div class="logo">
-                <img src="logo.jpg">
+                <img src="logo(1).jpg">
             </div>
             <nav>
                 <ul>
@@ -681,7 +754,18 @@
                     <i class="fas fa-play-circle"></i> Try Our Product Demo
                 </a>
             </div>
-            <a href="#" class="btn nav-link" data-page="contact">Get in Touch for Integration</a>
+            
+            <!-- 居中视频链接 -->
+            <div class="video-center-container">
+                <a href="https://www.bilibili.com/video/BV1FPvaBCETd/?vd_source=518a89f0d3ab00997410e42972096402" target="_blank" class="video-link">
+                    <i class="fas fa-video"></i> Watch Our Intro Video
+                </a>
+            </div>
+            
+            <!-- 右侧的"Get in Touch for Integration"按钮 -->
+            <div class="product-contact-container">
+                <a href="#" class="btn product-contact-btn nav-link" data-page="contact">Get in Touch for Integration</a>
+            </div>
         </section>
 
         <!-- About Us Page -->
@@ -869,10 +953,6 @@
                         <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
-                <!-- <p style="margin-top: 40px; text-align: center; color: #a0e7ff;">
-                    <i class="fas fa-map-marker-alt"></i> Pudong District
-                    <i class="fas fa-envelope"></i> contact@aeshield.ai
-                </p> -->
             </div>
         </section>
 
