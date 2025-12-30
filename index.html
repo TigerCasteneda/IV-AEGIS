@@ -1042,6 +1042,19 @@
             let digitalImageData = null;
             let faceImageData = null;
 
+            // Set default values to be more dramatic
+            digitalEpsilonSlider.value = 0.08;
+            digitalEpsilonValue.textContent = "0.08";
+            
+            digitalIterationsSlider.value = 15;
+            digitalIterationsValue.textContent = "15";
+            
+            faceFrequencySlider.value = 0.5;
+            faceFrequencyValue.textContent = "0.5";
+            
+            faceChannelSlider.value = 3;
+            faceChannelValue.textContent = "2.2"; // Default to more dramatic value
+
             // --- Digital Demo Sliders ---
             digitalEpsilonSlider.addEventListener('input', function() {
                 digitalEpsilonValue.textContent = this.value;
@@ -1055,9 +1068,9 @@
                 faceFrequencyValue.textContent = this.value;
             });
             faceChannelSlider.addEventListener('input', function() {
-                // Map slider position (0-5) to channel separation value (1.5 to 1.0)
+                // Map slider position (0-5) to more dramatic channel separation values (1.0 to 3.0)
                 const sliderValue = parseFloat(this.value);
-                const channelValue = 1.5 - (sliderValue * 0.1); // 1.5, 1.4, 1.3, 1.2, 1.1, 1.0
+                const channelValue = 1.0 + (sliderValue * 0.4); // 1.0, 1.4, 1.8, 2.2, 2.6, 3.0
                 faceChannelValue.textContent = channelValue.toFixed(1);
             });
 
@@ -1217,7 +1230,7 @@
             applyFaceBtn.addEventListener('click', () => {
                 if (!faceImageData) return;
                 const frequency = parseFloat(faceFrequencySlider.value);
-                const channel = parseInt(faceChannelSlider.value);
+                const channel = parseFloat(faceChannelValue.textContent);
                 
                 applyFaceBtn.innerHTML = '<i class="fas fa-cog fa-spin"></i> Processing...';
                 applyFaceBtn.disabled = true;
@@ -1230,7 +1243,7 @@
                         'Facial Protection Result',
                         humanVisible,
                         aiVisible,
-                        `Frequency=${frequency}, Channel=${faceChannelValue.textContent}`,
+                        `Frequency=${frequency}, Channel=${channel.toFixed(1)}`,
                         `Feature Point Offset: <span class="stat-value">${Math.round(10 + frequency*15)}%</span><br>
                          Recognition Confidence Drop: <span class="stat-value">${Math.round(70 + frequency*20-channel*0.2)}%</span>`
                     );
@@ -1240,7 +1253,7 @@
                 }, 1500);
             });
 
-            // --- Image Processing Simulation ---
+            // --- ENHANCED Image Processing Simulation ---
             function applyDigitalPerturbation(imageData, epsilon, iterations, forAI) {
                 const newData = new ImageData(
                     new Uint8ClampedArray(imageData.data),
@@ -1248,14 +1261,48 @@
                     imageData.height
                 );
                 const data = newData.data;
-                const strength = forAI ? epsilon * 30 * iterations : epsilon * 3;
                 
-                for (let i = 0; i < data.length; i += 4) {
-                    const x = (i/4) % imageData.width;
-                    const pattern = Math.sin(x * 0.05) * strength;
-                    data[i] = clamp(data[i] + pattern, 0, 255); // R
-                    data[i+1] = clamp(data[i+1] + pattern * 0.7, 0, 255); // G
-                    data[i+2] = clamp(data[i+2] + pattern * 0.4, 0, 255); // B
+                // DRAMATICALLY INCREASED PERTURBATIONS FOR AI VIEW
+                if (forAI) {
+                    // Enhanced strength for AI view - much more drastic
+                    const baseStrength = epsilon * 80 * (iterations / 5); // Increased multiplier
+                    const frequencyMultiplier = 0.2; // Higher frequency
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const x = (i/4) % imageData.width;
+                        const y = Math.floor((i/4) / imageData.width);
+                        
+                        // Multiple overlapping wave patterns for more complex perturbations
+                        const pattern1 = Math.sin(x * frequencyMultiplier * 2 + y * 0.03) * baseStrength;
+                        const pattern2 = Math.cos(x * 0.1 + y * 0.15) * baseStrength * 0.7;
+                        const pattern3 = Math.sin(x * 0.05 + y * 0.25) * baseStrength * 0.5;
+                        
+                        const totalPattern = (pattern1 + pattern2 + pattern3) * 1.5;
+                        
+                        // Apply with different weights to RGB channels for color distortion
+                        data[i] = clamp(data[i] + totalPattern, 0, 255); // R - strongest effect
+                        data[i+1] = clamp(data[i+1] + totalPattern * 0.9, 0, 255); // G
+                        data[i+2] = clamp(data[i+2] + totalPattern * 0.8, 0, 255); // B
+                        
+                        // Add some random noise for extra disruption
+                        if (Math.random() > 0.7) {
+                            const noise = (Math.random() - 0.5) * 30 * epsilon;
+                            data[i] = clamp(data[i] + noise, 0, 255);
+                            data[i+1] = clamp(data[i+1] + noise * 0.8, 0, 255);
+                            data[i+2] = clamp(data[i+2] + noise * 0.6, 0, 255);
+                        }
+                    }
+                } else {
+                    // Minimal changes for human view
+                    const strength = epsilon * 3;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const x = (i/4) % imageData.width;
+                        const pattern = Math.sin(x * 0.05) * strength;
+                        data[i] = clamp(data[i] + pattern, 0, 255);
+                        data[i+1] = clamp(data[i+1] + pattern * 0.7, 0, 255);
+                        data[i+2] = clamp(data[i+2] + pattern * 0.4, 0, 255);
+                    }
                 }
                 return newData;
             }
@@ -1267,15 +1314,64 @@
                     imageData.height
                 );
                 const data = newData.data;
-                const strength = forAI ? frequency * 50 * channel : frequency * 5;
                 
-                for (let i = 0; i < data.length; i += 4) {
-                    const x = (i/4) % imageData.width;
-                    const y = Math.floor((i/4) / imageData.width);
-                    const wave = Math.sin(x * 0.1 + y * 0.05) * strength;
-                    data[i] = clamp(data[i] + wave, 0, 255); // R
-                    data[i+1] = clamp(data[i+1] + wave * 0.8, 0, 255); // G
-                    data[i+2] = clamp(data[i+2] + wave * 0.6, 0, 255); // B
+                // DRAMATICALLY ENHANCED FACE PERTURBATIONS FOR AI VIEW
+                if (forAI) {
+                    // Much stronger effect for AI view
+                    const baseStrength = frequency * 120 * channel;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const x = (i/4) % imageData.width;
+                        const y = Math.floor((i/4) / imageData.width);
+                        
+                        // Complex multi-frequency interference patterns
+                        const wave1 = Math.sin(x * 0.15 + y * 0.08) * baseStrength;
+                        const wave2 = Math.cos(x * 0.25 + y * 0.12) * baseStrength * 0.8;
+                        const wave3 = Math.sin(x * 0.35 - y * 0.05) * baseStrength * 0.6;
+                        const wave4 = Math.cos(x * 0.08 + y * 0.2) * baseStrength * 0.4;
+                        
+                        const totalWave = (wave1 + wave2 + wave3 + wave4) * 1.2;
+                        
+                        // Apply different effects to different color channels
+                        data[i] = clamp(data[i] + totalWave, 0, 255); // R
+                        data[i+1] = clamp(data[i+1] + totalWave * 0.85, 0, 255); // G
+                        data[i+2] = clamp(data[i+2] + totalWave * 0.7, 0, 255); // B
+                        
+                        // Add checkerboard pattern for extra disruption
+                        if ((Math.floor(x / 8) + Math.floor(y / 8)) % 2 === 0) {
+                            const checker = 15 * frequency;
+                            data[i] = clamp(data[i] + checker, 0, 255);
+                            data[i+1] = clamp(data[i+1] - checker * 0.5, 0, 255);
+                            data[i+2] = clamp(data[i+2] + checker * 0.3, 0, 255);
+                        }
+                    }
+                    
+                    // Add edge enhancement to make features more distorted
+                    for (let i = 0; i < data.length - 4; i += 4) {
+                        const diffR = Math.abs(data[i] - data[i+4]);
+                        const diffG = Math.abs(data[i+1] - data[i+5]);
+                        const diffB = Math.abs(data[i+2] - data[i+6]);
+                        
+                        if (diffR + diffG + diffB > 30) {
+                            // Enhance edges with dramatic color shifts
+                            const edgeStrength = 25 * frequency;
+                            data[i] = clamp(data[i] + edgeStrength, 0, 255);
+                            data[i+1] = clamp(data[i+1] - edgeStrength * 0.7, 0, 255);
+                            data[i+2] = clamp(data[i+2] + edgeStrength * 0.4, 0, 255);
+                        }
+                    }
+                } else {
+                    // Subtle changes for human view
+                    const strength = frequency * 5;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const x = (i/4) % imageData.width;
+                        const y = Math.floor((i/4) / imageData.width);
+                        const wave = Math.sin(x * 0.1 + y * 0.05) * strength;
+                        data[i] = clamp(data[i] + wave, 0, 255);
+                        data[i+1] = clamp(data[i+1] + wave * 0.8, 0, 255);
+                        data[i+2] = clamp(data[i+2] + wave * 0.6, 0, 255);
+                    }
                 }
                 return newData;
             }
