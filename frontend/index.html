@@ -1007,6 +1007,11 @@
             }
         }
 
+        // API URL 配置（部署后替换为实际的后端 URL）
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3001'  // 本地开发
+            : 'https://YOUR-BACKEND-URL-HERE';  // 生产环境 - 部署后替换这里！
+        
         // Contact form submission with backend integration
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1021,7 +1026,7 @@
             submitButton.disabled = true;
             
             try {
-                const response = await fetch('http://localhost:3001/api/contact/submit', {
+                const response = await fetch(`${API_URL}/api/contact/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
