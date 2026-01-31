@@ -1007,10 +1007,10 @@
             }
         }
 
-        // API URL 配置（部署后替换为实际的后端 URL）
+        // API URL 配置（自动切换本地和生产环境）
         const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:3001'  // 本地开发
-            : 'https://YOUR-BACKEND-URL-HERE';  // 生产环境 - 部署后替换这里！
+            : 'https://iv-aegis-worker.tiger-liu-2010.workers.dev';  // Cloudflare Workers 后端
         
         // Contact form submission with backend integration
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
