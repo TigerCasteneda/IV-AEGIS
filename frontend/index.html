@@ -1007,6 +1007,11 @@
             }
         }
 
+        // API 地址配置（根据环境自动选择）
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3001'  // 本地开发环境
+            : 'https://your-backend-url.railway.app'; // 生产环境 - 部署后需要替换为实际的后端 URL
+        
         // Contact form submission with backend integration
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1021,7 +1026,7 @@
             submitButton.disabled = true;
             
             try {
-                const response = await fetch('http://localhost:3001/api/contact/submit', {
+                const response = await fetch(`${API_URL}/api/contact/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1039,7 +1044,7 @@
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
-                alert('❌ Failed to send message. Please make sure the server is running.');
+                alert('❌ Failed to send message. Please check your connection and try again.');
             } finally {
                 submitButton.innerHTML = originalButtonText;
                 submitButton.disabled = false;

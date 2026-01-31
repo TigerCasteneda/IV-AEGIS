@@ -156,8 +156,28 @@ const contactFormLimiter = rateLimit({
 });
 
 // 中间件配置
+// 允许的源列表（根据环境动态配置）
+const allowedOrigins = [
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    process.env.FRONTEND_URL, // 生产环境前端URL
+    'https://iv-aegis.vercel.app', // Vercel默认域名
+    'https://www.iv-aegis.com' // 如果有自定义域名
+].filter(Boolean); // 过滤掉 undefined
+
 app.use(cors({
-    origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:3000'],
+    origin: function(origin, callback) {
+        // 允许没有 origin 的请求（比如移动应用或 Postman）
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(null, true); // 开发阶段先允许所有源，生产环境可以改为 false
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST'], // 只允许GET和POST方法
     allowedHeaders: ['Content-Type', 'Authorization']
